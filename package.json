@@ -2,7 +2,7 @@
   "name": "react-native-turbo-location",
   "version": "0.1.0",
   "description": "For get location on foreground only using turbo support new arch and legacy",
-  "source": "./src/index.tsx",
+  "source": "./src/index.ts",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "exports": {

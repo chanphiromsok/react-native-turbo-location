@@ -6,7 +6,7 @@ const result = multiply(3, 7);
 
 export default function App() {
   useEffect(() => {
-    NativeModules.TurboLocation.multiply(3, 7).then((v) => {
+    NativeModules.TurboLocation?.multiply(3, 7).then((v: number) => {
       console.log(v);
     });
   }, []);
