@@ -9,7 +9,7 @@ import java.util.HashMap
 
 class TurboLocationPackage : BaseReactPackage() {
   override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? {
-    return if (name == TurboLocationModule.NAME) {
+    return if (name == TurboLocationModuleImpl.NAME) {
       TurboLocationModule(reactContext)
     } else {
       null
@@ -19,9 +19,9 @@ class TurboLocationPackage : BaseReactPackage() {
   override fun getReactModuleInfoProvider(): ReactModuleInfoProvider {
     return ReactModuleInfoProvider {
       val moduleInfos: MutableMap<String, ReactModuleInfo> = HashMap()
-      moduleInfos[TurboLocationModule.NAME] = ReactModuleInfo(
-        TurboLocationModule.NAME,
-        TurboLocationModule.NAME,
+      moduleInfos[TurboLocationModuleImpl.NAME] = ReactModuleInfo(
+        TurboLocationModuleImpl.NAME,
+        TurboLocationModuleImpl.NAME,
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         true,  // hasConstants
