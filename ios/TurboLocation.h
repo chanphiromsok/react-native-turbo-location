@@ -1,9 +1,12 @@
 
-#import "generated/RNTurboLocationSpec/RNTurboLocationSpec.h"
-
 #ifdef RCT_NEW_ARCH_ENABLED
 
-@interface TurboLocation : NSObject <NativeTurboLocationSpec>
+    #import "RNTurboLocationSpec.h"
+    @interface TurboLocation : NSObject <NativeTurboLocationSpec>
+#else
+    #import <React/RCTBridgeModule.h>
+    @interface TurboLocation : NSObject <RCTBridgeModule>
 
-@end
 #endif
+@end
+

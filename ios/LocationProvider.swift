@@ -9,8 +9,11 @@ import Foundation
 
 
 @objcMembers
-class LocationProvider: NSObject {
-    static func getCurrentLocation(){
+public class LocationProvider: NSObject {
+    static public func getCurrentLocation(){
         print("getCurrentLocation")
+    }
+    public static func multiply(a: Double, b: Double) -> Double {
+        return a * b
     }
 }

@@ -12,8 +12,15 @@ RCT_EXPORT_MODULE()
 
 - (NSNumber *)multiply:(double)a b:(double)b {
     NSNumber *result = @(a * b);
-    
     return result;
+}
+RCT_EXPORT_METHOD(multiply:(double)a
+                  b:(double)b
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+{
+    double result =  [LocationProvider multiplyWithA:a b:b]; // 👈
+    resolve([NSNumber numberWithDouble:result]); // 👈
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
