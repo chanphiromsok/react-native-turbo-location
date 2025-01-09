@@ -1,18 +1,22 @@
 import { useEffect } from 'react';
-import { Text, View, StyleSheet, NativeModules } from 'react-native';
-import { multiply } from 'react-native-turbo-location';
-
-const result = multiply(3, 7);
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import {
+  ModuleEventEmitter,
+  getCurrentLocation,
+} from 'react-native-turbo-location';
 
 export default function App() {
   useEffect(() => {
-    NativeModules.TurboLocation?.multiply(3, 7).then((v: number) => {
-      console.log(v);
+    ModuleEventEmitter.addListener('onLocationChange', (value) => {
+      console.log('ModuleEventEmitter sqrt', value);
+    });
+    getCurrentLocation().then((v) => {
+      Alert.alert('Call ' + v);
     });
   }, []);
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Result:</Text>
     </View>
   );
 }

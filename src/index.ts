@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
 const LINKING_ERROR =
   "The package 'react-native-mock-location-detector' doesn't seem to be linked. Make sure: \n\n" +
@@ -23,6 +23,7 @@ const TurboLocation = TurboLocationModule
         },
       }
     );
-export function multiply(a: number, b: number): number {
-  return TurboLocation.multiply(a, b);
+export const ModuleEventEmitter = new NativeEventEmitter(TurboLocation);
+export async function getCurrentLocation() {
+  return TurboLocation.getCurrentLocation();
 }
