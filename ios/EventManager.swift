@@ -11,7 +11,7 @@ import Foundation
 public class EventManager:NSObject {
     @objc public weak var delegate: TurboLocationEventEmitterDelegate? = nil
     
-    func sendLocationChange(orientationValue: Int) {
+    func sendLocationChange(orientationValue: Double) {
         guard let delegate = delegate else {
             return
         }

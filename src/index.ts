@@ -27,3 +27,9 @@ export const ModuleEventEmitter = new NativeEventEmitter(TurboLocation);
 export async function getCurrentLocation() {
   return TurboLocation.getCurrentLocation();
 }
+
+export async function startWatching() {
+  return TurboLocation.startWatching();
+}
+
+console.log(TurboLocation);

@@ -48,6 +48,17 @@ RCT_EXPORT_METHOD(getCurrentLocation:(RCTPromiseResolveBlock)resolve reject:(RCT
     });
 }
 
+RCT_EXPORT_METHOD(startWatching:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    LocationOptions *options = [[LocationOptions alloc] init];
+    options.distanceFilter = 10.0;
+    options.pauseUpdatesAutomatically = YES;
+    options.accuracy = LocationAccuracyMedium;
+    NSLog(@"startWatching");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->turboLocation startWatchingWithOption:options];
+    });
+}
+
 - (void)sendEventWithName:(NSString * _Nonnull)name params:(NSDictionary *)params {
     [self sendEventWithName:name body:params];
 }

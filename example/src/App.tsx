@@ -3,6 +3,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import {
   ModuleEventEmitter,
   getCurrentLocation,
+  startWatching,
 } from 'react-native-turbo-location';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
     ModuleEventEmitter.addListener('onLocationChange', (value) => {
       console.log('ModuleEventEmitter sqrt', value);
     });
+    startWatching();
     getCurrentLocation().then((v) => {
       Alert.alert('Call ' + v);
     });
