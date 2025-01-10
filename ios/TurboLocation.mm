@@ -39,14 +39,26 @@ RCT_EXPORT_MODULE()
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-    return [EventManager supportedEvents];
+    return [TurboLocationEventManager supportedEvents];
 }
 // Options 2.D - Implement the Specs
 RCT_EXPORT_METHOD(getCurrentLocation:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    TurboLocationOptions *options = [[TurboLocationOptions alloc] init];
+    options.distanceFilter = 10.0;
+    options.pauseUpdatesAutomatically = YES;
+    options.accuracy = LocationAccuracyMedium;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self->turboLocation getCurrentLocation];
+        [self->turboLocation getCurrentLocationWithOption:options];
     });
     resolve(@"OK");
+}
+
+RCT_EXPORT_METHOD(startWatching:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    TurboLocationOptions *options = [[TurboLocationOptions alloc] init];
+    options.distanceFilter = 10.0;
+    options.pauseUpdatesAutomatically = YES;
+    options.accuracy = LocationAccuracyMedium;
+    [turboLocation startWatchingWithOption:options];
 }
 
 RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
@@ -56,13 +68,7 @@ RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTP
     resolve(@"Ok");
 }
 
-RCT_EXPORT_METHOD(startWatching:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    LocationOptions *options = [[LocationOptions alloc] init];
-    options.distanceFilter = 10.0;
-    options.pauseUpdatesAutomatically = YES;
-    options.accuracy = LocationAccuracyMedium;
-    [turboLocation startWatchingWithOption:options];
-}
+
 
 - (void)sendEventWithName:(NSString * _Nonnull)name params:(NSDictionary *)params {
     [self sendEventWithName:name body:params];

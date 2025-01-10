@@ -1,5 +1,5 @@
 //
-//  LocationOptions.swift
+//  TurboLocationOptions.swift
 //  react-native-turbo-location
 //
 //  Created by rom on 09/01/2025.
@@ -8,14 +8,14 @@
 import Foundation
 import CoreLocation
 
-@objc public class LocationOptions: NSObject {
+@objc public class TurboLocationOptions: NSObject {
     @objc public var distanceFilter: CLLocationDistance = kCLDistanceFilterNone
     @objc public var pauseUpdatesAutomatically: Bool = false
     @objc public var accuracy: Int = LocationAccuracy.medium.rawValue
     
-//    @objc public override init() {
-//        super.init()
-//    }
+    @objc public override init() {
+        super.init()
+    }
     
     @objc public convenience init(
         distanceFilter: CLLocationDistance,

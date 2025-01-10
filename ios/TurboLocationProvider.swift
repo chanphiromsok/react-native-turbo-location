@@ -9,7 +9,7 @@ import CoreLocation
 
 class TurboLocationProvider: NSObject {
     private let locationManager: CLLocationManager
-    private var locationOptions: LocationOptions? = nil
+    private var locationOptions: TurboLocationOptions? = nil
     weak var delegate: TurboLocationProviderDelegate?
     
     override init() {
@@ -18,39 +18,41 @@ class TurboLocationProvider: NSObject {
         locationManager.delegate = self
     }
     
-//    deinit {
-//        removeLocationUpdates()
-//        locationManager.delegate = nil;
-//        locationOptions=nil
-//    }
+    deinit {
+        removeLocationUpdates()
+        locationManager.delegate = nil;
+        locationOptions=nil
+    }
     
     
     
     func requestPermission(_ level: String) -> Void {
         print("TurboProvider requestPermission",level)
         if level == "whenInUse" {
-          locationManager.requestWhenInUseAuthorization()
+            locationManager.requestWhenInUseAuthorization()
         } else if level == "always" {
-          locationManager.requestAlwaysAuthorization()
-
+            locationManager.requestAlwaysAuthorization()
+            
         }
     }
     
-    func getCurrentLocation(){
+    func getCurrentLocation(option: TurboLocationOptions){
         print("TurboProvider call getCurrentLocation")
+        locationManager.desiredAccuracy = CLLocationAccuracy(option.accuracy)
+        locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.requestLocation()
     }
     
-    func requestLocationUpdates(option: LocationOptions) -> Void {
+    func requestLocationUpdates(option: TurboLocationOptions) -> Void {
         locationOptions = option
         locationManager.desiredAccuracy = CLLocationAccuracy(locationOptions!.accuracy)
         locationManager.distanceFilter = locationOptions!.distanceFilter
         locationManager.activityType = .automotiveNavigation
         locationManager.allowsBackgroundLocationUpdates = false
         locationManager.pausesLocationUpdatesAutomatically = locationOptions!.pauseUpdatesAutomatically
-
+        
         if #available(iOS 11.0, *) {
-           locationManager.showsBackgroundLocationIndicator = false
+            locationManager.showsBackgroundLocationIndicator = false
         }
         
         locationManager.startUpdatingLocation()
@@ -108,6 +110,7 @@ extension TurboLocationProvider: CLLocationManagerDelegate {
             NSLog("RNLocation: \(error.localizedDescription)")
         }
         
-       
+        
     }
 }
+

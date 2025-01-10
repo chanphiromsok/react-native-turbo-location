@@ -13,24 +13,28 @@ import CoreLocation
 public class TurboLocationImpl: NSObject {
     private var continuousLocationProvider: TurboLocationProvider? = nil
     
-    @objc public func startWatching(option: LocationOptions?){
+    @objc public func startWatching(option: TurboLocationOptions?){
         var locationOption = option
         if continuousLocationProvider == nil {
             continuousLocationProvider = TurboLocationProvider()
             continuousLocationProvider!.delegate = self
         }
         if locationOption == nil {
-            locationOption = LocationOptions()
+            locationOption = TurboLocationOptions()
         }
         continuousLocationProvider?.requestLocationUpdates(option: locationOption!)
     }
     
-    @objc public func getCurrentLocation() -> Void {
+    @objc public func getCurrentLocation(option: TurboLocationOptions?) -> Void {
+        var locationOption = option
         if continuousLocationProvider == nil {
             continuousLocationProvider = TurboLocationProvider()
             continuousLocationProvider?.delegate = self
         }
-        continuousLocationProvider?.getCurrentLocation()
+        if locationOption == nil {
+            locationOption = TurboLocationOptions()
+        }
+        continuousLocationProvider?.getCurrentLocation(option: locationOption!)
     }
     
     @objc public func requestPermission() -> Void {
@@ -46,7 +50,7 @@ public class TurboLocationImpl: NSObject {
             continuousLocationProvider?.removeLocationUpdates()
         }
     }
-    private let eventManager: EventManager = EventManager()
+    private let eventManager: TurboLocationEventManager = TurboLocationEventManager()
     // Event Emitter Setup
     @objc public func setEventManager(delegate: TurboLocationEventEmitterDelegate) {
         self.eventManager.delegate = delegate
@@ -65,4 +69,14 @@ extension TurboLocationImpl: TurboLocationProviderDelegate {
         eventManager.sendLocationChange(location: location);
     }
     
+}
+
+extension CLLocation {
+    func isSimulated() -> Bool {
+        if #available(iOS 15.0, *) {
+            return self.sourceInformation?.isSimulatedBySoftware ?? false
+        } else {
+            return false
+        }
+    }
 }

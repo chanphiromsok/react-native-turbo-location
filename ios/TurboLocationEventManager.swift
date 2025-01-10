@@ -1,5 +1,5 @@
 //
-//  EventManager.swift
+//  TurboLocationEventManager.swift
 //  react-native-turbo-location
 //
 //  Created by rom on 09/01/2025.
@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 
 @objc
-public class EventManager:NSObject {
+public class TurboLocationEventManager:NSObject {
     @objc public weak var delegate: TurboLocationEventEmitterDelegate? = nil
     
     func sendLocationChange(location: CLLocation) {
@@ -19,17 +19,7 @@ public class EventManager:NSObject {
         if (!delegate.isJsListening) {
             return
         }
-        print(Event.onLocationChange.rawValue)
-        let params = [
-            "latitude" : location.coordinate.latitude,
-            "longitude" : location.coordinate.longitude,
-            "heading" : location.course,
-            "speed" : location.speed,
-            "accuracy": location.speedAccuracy,
-            "timestamp": location.timestamp,
-            "altitude": location.altitude
-            
-        ] as [String : Any]
+        let params = locationToDict(location)
         delegate.sendEvent(name: Event.onLocationChange.rawValue, params: params as NSDictionary)
     }
     
@@ -40,9 +30,23 @@ public class EventManager:NSObject {
         if (!delegate.isJsListening) {
             return
         }
-        print(Event.didAuthorizedChange.rawValue)
         let params = Dictionary(dictionaryLiteral: ("status", status))
         delegate.sendEvent(name: Event.didAuthorizedChange.rawValue, params: params as NSDictionary)
+    }
+    private func locationToDict(_ location: CLLocation) -> [String: Any] {
+        return [
+            "coords": [
+                "latitude": location.coordinate.latitude,
+                "longitude": location.coordinate.longitude,
+                "altitude": location.altitude,
+                "accuracy": location.horizontalAccuracy,
+                "altitudeAccuracy": location.verticalAccuracy,
+                "heading": location.course,
+                "speed": location.speed,
+                "mocked": location.isSimulated()
+            ],
+            "timestamp": location.timestamp.timeIntervalSince1970 * 1000 // ms
+        ]
     }
 }
 
@@ -52,7 +56,7 @@ public class EventManager:NSObject {
     func sendEvent(name: String, params: NSDictionary)
 }
 
-extension EventManager {
+extension TurboLocationEventManager {
     
     enum Event: String, CaseIterable {
         case onLocationChange
