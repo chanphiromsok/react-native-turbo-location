@@ -17,8 +17,7 @@ type Location = {
 
 type SuccessParams = Location;
 type ErrorParams = {
-  error: string;
-  code: string;
+  reason: string;
 };
 export type SuccessCallBack = (params: SuccessParams) => void;
 export type ErrorCallback = (params: ErrorParams) => void;
@@ -30,6 +29,7 @@ export interface Spec extends TurboModule {
     errorCallback: ErrorCallback
   ): void;
   startWatching(successCallback: SuccessCallBack): void;
+  stopUpdatingLocation(): void;
   addListener: (eventType: string) => void;
   removeListeners: (count: number) => void;
 }

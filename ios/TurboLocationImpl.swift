@@ -6,17 +6,16 @@
 //
 
 import CoreLocation
-import Foundation
-import UIKit
 
 @objc
 public class TurboLocationImpl: NSObject {
     private let continuousLocationProvider: CLLocationManager
     private let eventManager: TurboLocationEventManager = TurboLocationEventManager()
     private var successCallback: ((NSDictionary) -> Void)?
-    private var failureCallback: ((NSError) -> Void)?
+    private var failureCallback: ((NSDictionary) -> Void)?
     private var isOneShoot = false
-    
+    private var locationUpdateTask: Task<Void, Never>?
+
     @objc(init)
     public override init() {
         continuousLocationProvider = CLLocationManager()
@@ -26,41 +25,27 @@ public class TurboLocationImpl: NSObject {
     
     
     @objc public func startWatching(_ success: @escaping (NSDictionary) -> Void){
-        
         if #available(iOS 17.0, *) {
-            startLocationUpdates(success)
+            startLocationLiveUpdates()
         } else {
-            // Fallback on earlier versions
+            continuousLocationProvider.startUpdatingLocation()
         }
     }
     
     
     @available(iOS 17.0, *)
-    func startLocationUpdates(_ success: @escaping (NSDictionary) -> Void) {
+    func startLocationLiveUpdates() {
         // Take location permissions before
-        Task {
+        locationUpdateTask?.cancel()
+        locationUpdateTask = Task {
             do {
-                let updates = CLLocationUpdate.liveUpdates()
-                for try await update in updates {
-                    let locationDict: NSDictionary = [
-                        "coords": [
-                            "latitude": update.location?.coordinate.latitude as Any,
-                            "longitude": update.location?.coordinate.longitude,
-                            "altitude": update.location?.altitude,
-                            "accuracy": update.location?.horizontalAccuracy,
-                            "altitudeAccuracy": update.location?.verticalAccuracy,
-                            "heading": update.location?.course,
-                            "speed": update.location?.speed,
-                            "mocked": update.location?.isSimulated()
-                        ],
-                        "timestamp": (update.location?.timestamp.timeIntervalSince1970)! * 1000 // ms
-                    ]
-//                    TODO use even emitter
-                    print ("Current Location is \(String(describing: update.location))")
-
+                for try await locationUpdates in CLLocationUpdate.liveUpdates() {
+                    guard let location = locationUpdates.location else {
+                        return
+                    }
                     
-                    // To stop updates break out of the for loop
-                    if update.isStationary {
+                    eventManager.onLocationChange(location: location)
+                    if locationUpdates.isStationary {
                         break
                     }
                 }
@@ -71,21 +56,27 @@ public class TurboLocationImpl: NSObject {
     }
     
     @objc public func getCurrentLocation(_ success: @escaping (NSDictionary) -> Void,
-                                         failure: @escaping (NSError) -> Void) -> Void {
+                                         failure: @escaping (NSDictionary) -> Void) -> Void {
         self.successCallback = success
         self.failureCallback = failure
         continuousLocationProvider.distanceFilter = kCLDistanceFilterNone
+        continuousLocationProvider.pausesLocationUpdatesAutomatically = false
+        continuousLocationProvider.activityType = .otherNavigation
+        continuousLocationProvider.desiredAccuracy = kCLLocationAccuracyBest
+        
         continuousLocationProvider.requestLocation()
     }
     
     
     @objc public func requestPermission() -> Void {
-        
-        //        continuousLocationProvider?.requestPermission("whenInUse")
+        continuousLocationProvider.requestWhenInUseAuthorization()
     }
     
     @objc public func stopUpdatingLocation(){
-        //        continuousLocationProvider?.removeLocationUpdates()
+        locationUpdateTask?.cancel()
+        locationUpdateTask = nil
+        
+        
     }
     // Event Emitter Setup
     @objc public func setEventManager(delegate: TurboLocationEventEmitterDelegate) {
@@ -101,9 +92,9 @@ extension TurboLocationImpl: CLLocationManagerDelegate, TurboLocationImplDelegat
         eventManager.onPermissionChange(status: status)
     }
     
-//    func onLocationChange(_ provider: TurboLocationImpl, location: CLLocation) {
-//        eventManager.sendLocationChange(location: location);
-//    }
+    func onLocationChange(_ provider: TurboLocationImpl, location: CLLocation) {
+        eventManager.onLocationChange(location: location);
+    }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location: CLLocation = locations.last else { return }
@@ -120,16 +111,19 @@ extension TurboLocationImpl: CLLocationManagerDelegate, TurboLocationImplDelegat
             ],
             "timestamp": location.timestamp.timeIntervalSince1970 * 1000 // ms
         ]
-        successCallback?(locationDict)
+        
         
         if(isOneShoot){
+            successCallback?(locationDict)
             continuousLocationProvider.stopUpdatingLocation()
             successCallback=nil
+        }else{
+            eventManager.onLocationChange(location: location)
         }
         
     }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        failureCallback?(error as NSError)
+        failureCallback?(["message" : error.localizedDescription])
     }
 }

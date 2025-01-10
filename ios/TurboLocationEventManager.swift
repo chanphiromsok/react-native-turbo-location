@@ -11,7 +11,7 @@ import CoreLocation
 public class TurboLocationEventManager:NSObject {
     @objc public weak var delegate: TurboLocationEventEmitterDelegate? = nil
     
-    func sendLocationChange(location: CLLocation) {
+    func onLocationChange(location: CLLocation) {
         guard let delegate = delegate else {
             return
         }

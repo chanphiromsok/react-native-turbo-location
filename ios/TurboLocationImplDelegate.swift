@@ -9,5 +9,5 @@ import CoreLocation
 
 protocol TurboLocationImplDelegate: AnyObject {
     func onPermissionChange(_ provider: TurboLocationImpl, status: CLAuthorizationStatus)
-//    func onLocationChange(_ provider: TurboLocationProvider, location: CLLocation)
+    func onLocationChange(_ provider: TurboLocationImpl, location: CLLocation)
 }

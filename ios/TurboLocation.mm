@@ -35,6 +35,7 @@ RCT_EXPORT_MODULE()
 
 - (void)dealloc
 {
+    [self->turboLocation stopUpdatingLocation];
     self->turboLocation = nil;
     self->options = nil;
 }
@@ -53,24 +54,32 @@ RCT_EXPORT_MODULE()
 }
 // https://github.com/reactwg/react-native-new-architecture/blob/main/docs/enable-libraries-ios.md callback:(RCTResponseSenderBlock)callback
 // Options 2.D - Implement the Specs
+typedef void(^TurboCallback)(NSDictionary *location);
+
 RCT_EXPORT_METHOD(getCurrentLocation:(RCTResponseSenderBlock)successCallback
                          errorCallback:(RCTResponseSenderBlock)errorCallback) {
-    [self->turboLocation getCurrentLocation:^(NSDictionary *location) {
+    
+    TurboCallback success = ^(NSDictionary *location) {
         successCallback(@[location]);
-    } failure:^(NSError *error) {
-        errorCallback(@[@{
-            @"code": @(error.code),
-            @"message": error.localizedDescription
-        }]);
-    }];
+    };
+    
+    TurboCallback failure= ^(NSDictionary *error) {
+        errorCallback(@[error]);
+    };
+    
+    [self->turboLocation getCurrentLocation:success failure:failure];
+}
+RCT_EXPORT_METHOD(startWatching:(RCTResponseSenderBlock)successCallback) {
+    TurboCallback callback = ^(NSDictionary *location) {
+            successCallback(@[location]);
+    };
+    [turboLocation startWatching:callback];
 }
 
-RCT_EXPORT_METHOD(startWatching:(RCTResponseSenderBlock)successCallback) {
-    
-    [turboLocation startWatching:^(NSDictionary *location){
-        successCallback(@[location]);
-    }];
-}
+RCT_EXPORT_METHOD(stopUpdatingLocation) {
+    [turboLocation stopUpdatingLocation];
+};
+
 
 RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_main_queue(), ^{

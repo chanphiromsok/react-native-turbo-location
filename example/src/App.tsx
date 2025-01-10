@@ -3,14 +3,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   getCurrentLocation,
   requestPermission,
-  startWatching,
 } from 'react-native-turbo-location';
 
 export default function App() {
   useEffect(() => {
-    startWatching((location) => {
-      console.log('Location', location);
-    });
     requestPermission();
   }, []);
   return (
@@ -19,9 +15,14 @@ export default function App() {
       <TouchableOpacity>
         <Text
           onPress={() => {
-            getCurrentLocation((location) => {
-              console.log(location);
-            });
+            getCurrentLocation(
+              (location) => {
+                console.log(location);
+              },
+              (err) => {
+                console.log('getError', err);
+              }
+            );
           }}
         >
           Get Location

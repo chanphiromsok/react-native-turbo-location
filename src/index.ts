@@ -49,3 +49,7 @@ export async function startWatching(success: SuccessCallBack) {
 
   // return listener;
 }
+
+export async function stopUpdating() {
+  TurboLocationModule.stopUpdatingLocation();
+}
