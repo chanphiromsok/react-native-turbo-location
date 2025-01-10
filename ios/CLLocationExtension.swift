@@ -16,3 +16,22 @@ extension CLLocation {
         }
     }
 }
+
+extension CLAuthorizationStatus {
+    func toString() -> String {
+        switch self {
+        case .authorizedWhenInUse:
+            return "authorizedWhenInUse"
+        case .authorizedAlways:
+            return "authorizedAlways"
+        case .denied:
+            return "denied"
+        case .restricted:
+            return "restricted"
+        case .notDetermined:
+            return "notDetermined"
+        @unknown default:
+            return "unknown"
+        }
+    }
+}

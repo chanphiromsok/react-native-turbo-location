@@ -40,12 +40,12 @@ export async function getCurrentLocation(
 }
 
 // type OnLocationChange = (location: any) => void;
-export async function startWatching() {
+export async function startWatching(success: SuccessCallBack) {
   // const listener = ModuleEventEmitter.addListener(
   //   'onLocationChange',
   //   onLocationChange
   // );
-  await TurboLocationModule.startWatching();
+  await TurboLocationModule.startWatching(success);
 
   // return listener;
 }

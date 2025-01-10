@@ -29,7 +29,7 @@ export interface Spec extends TurboModule {
     successCallback: SuccessCallBack,
     errorCallback: ErrorCallback
   ): void;
-  startWatching(): Promise<void>;
+  startWatching(successCallback: SuccessCallBack): void;
   addListener: (eventType: string) => void;
   removeListeners: (count: number) => void;
 }

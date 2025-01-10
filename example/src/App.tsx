@@ -1,16 +1,15 @@
 import { useEffect } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   getCurrentLocation,
-  ModuleEventEmitter,
   requestPermission,
+  startWatching,
 } from 'react-native-turbo-location';
 
 export default function App() {
   useEffect(() => {
-    ModuleEventEmitter.addListener('onLocationChange', (value) => {
-      console.log('ModuleEventEmitter sqrt', value);
-      Alert.alert(`${value.coords.latitude} ${value.coords.longitude}`);
+    startWatching((location) => {
+      console.log('Location', location);
     });
     requestPermission();
   }, []);

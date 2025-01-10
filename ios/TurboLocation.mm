@@ -53,18 +53,6 @@ RCT_EXPORT_MODULE()
 }
 // https://github.com/reactwg/react-native-new-architecture/blob/main/docs/enable-libraries-ios.md callback:(RCTResponseSenderBlock)callback
 // Options 2.D - Implement the Specs
-//RCT_EXPORT_METHOD(getCurrentLocation:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-//    
-//    options.distanceFilter = 10.0;
-//    options.pauseUpdatesAutomatically = YES;
-//    options.accuracy = LocationAccuracyMedium;
-////    NSLog(@"New arch enabeld %d", RCT_NEW_ARCH_ENABLED);
-//    
-////    dispatch_async(dispatch_get_main_queue(), ^{
-////        [self->turboLocation getCurrentLocationWithOptions:self->options];
-////    });
-//}
-
 RCT_EXPORT_METHOD(getCurrentLocation:(RCTResponseSenderBlock)successCallback
                          errorCallback:(RCTResponseSenderBlock)errorCallback) {
     [self->turboLocation getCurrentLocation:^(NSDictionary *location) {
@@ -77,12 +65,11 @@ RCT_EXPORT_METHOD(getCurrentLocation:(RCTResponseSenderBlock)successCallback
     }];
 }
 
-RCT_EXPORT_METHOD(startWatching:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    TurboLocationOptions *options = [[TurboLocationOptions alloc] init];
-    options.distanceFilter = 10.0;
-    options.pauseUpdatesAutomatically = YES;
-    options.accuracy = LocationAccuracyMedium;
-    [turboLocation startWatchingWithOptions:options];
+RCT_EXPORT_METHOD(startWatching:(RCTResponseSenderBlock)successCallback) {
+    
+    [turboLocation startWatching:^(NSDictionary *location){
+        successCallback(@[location]);
+    }];
 }
 
 RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
