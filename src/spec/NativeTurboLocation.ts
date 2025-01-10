@@ -11,6 +11,7 @@ type Location = {
   speed: number;
 };
 export interface Spec extends TurboModule {
+  requestPermission(): Promise<void>;
   getCurrentLocation(): Promise<Location>;
   startWatching(): Promise<void>;
   addListener: (eventType: string) => void;

@@ -18,10 +18,27 @@ class TurboLocationProvider: NSObject {
         locationManager.delegate = self
     }
     
-    deinit {
-        removeLocationUpdates()
-        locationManager.delegate = nil;
-        locationOptions=nil
+//    deinit {
+//        removeLocationUpdates()
+//        locationManager.delegate = nil;
+//        locationOptions=nil
+//    }
+    
+    
+    
+    func requestPermission(_ level: String) -> Void {
+        print("TurboProvider requestPermission",level)
+        if level == "whenInUse" {
+          locationManager.requestWhenInUseAuthorization()
+        } else if level == "always" {
+          locationManager.requestAlwaysAuthorization()
+
+        }
+    }
+    
+    func getCurrentLocation(){
+        print("TurboProvider call getCurrentLocation")
+        locationManager.requestLocation()
     }
     
     func requestLocationUpdates(option: LocationOptions) -> Void {
@@ -55,8 +72,6 @@ class TurboLocationProvider: NSObject {
 
 extension TurboLocationProvider: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        // When CLLocationManager instance is created, it'll trigger this method.
-        // Status can be undetermined in that case.
         if status == .notDetermined {
             return
         }
@@ -64,14 +79,12 @@ extension TurboLocationProvider: CLLocationManagerDelegate {
         delegate?.onPermissionChange(self, status: status)
     }
     
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location: CLLocation = locations.last else { return }
-        
-#if DEBUG
-        NSLog("RNLocation: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-#endif
-        
+        print("Locations updated: \(locations)")
         delegate?.onLocationChange(self, location: location)
+        
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

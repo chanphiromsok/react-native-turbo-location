@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import {
-  ModuleEventEmitter,
   getCurrentLocation,
-  startWatching,
+  ModuleEventEmitter,
+  requestPermission,
 } from 'react-native-turbo-location';
 
 export default function App() {
@@ -11,10 +11,8 @@ export default function App() {
     ModuleEventEmitter.addListener('onLocationChange', (value) => {
       console.log('ModuleEventEmitter sqrt', value);
     });
-    startWatching();
-    getCurrentLocation().then((v) => {
-      Alert.alert('Call ' + v);
-    });
+    getCurrentLocation();
+    requestPermission();
   }, []);
   return (
     <View style={styles.container}>

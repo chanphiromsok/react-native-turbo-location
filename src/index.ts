@@ -24,12 +24,22 @@ const TurboLocation = TurboLocationModule
       }
     );
 export const ModuleEventEmitter = new NativeEventEmitter(TurboLocation);
+export async function requestPermission() {
+  return TurboLocationModule.requestPermission();
+}
 export async function getCurrentLocation() {
-  return TurboLocation.getCurrentLocation();
+  return TurboLocationModule.getCurrentLocation();
 }
 
+// type OnLocationChange = (location: any) => void;
 export async function startWatching() {
-  return TurboLocation.startWatching();
+  // const listener = ModuleEventEmitter.addListener(
+  //   'onLocationChange',
+  //   onLocationChange
+  // );
+  await TurboLocationModule.startWatching();
+
+  // return listener;
 }
 
-console.log(TurboLocation);
+console.log(TurboLocationModule);

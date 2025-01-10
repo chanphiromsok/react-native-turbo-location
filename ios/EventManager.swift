@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import CoreLocation
 
 @objc
 public class EventManager:NSObject {
     @objc public weak var delegate: TurboLocationEventEmitterDelegate? = nil
     
-    func sendLocationChange(orientationValue: Double) {
+    func sendLocationChange(location: CLLocation) {
         guard let delegate = delegate else {
             return
         }
@@ -19,8 +20,29 @@ public class EventManager:NSObject {
             return
         }
         print(Event.onLocationChange.rawValue)
-        let params = Dictionary(dictionaryLiteral: ("orientation", orientationValue))
+        let params = [
+            "latitude" : location.coordinate.latitude,
+            "longitude" : location.coordinate.longitude,
+            "heading" : location.course,
+            "speed" : location.speed,
+            "accuracy": location.speedAccuracy,
+            "timestamp": location.timestamp,
+            "altitude": location.altitude
+            
+        ] as [String : Any]
         delegate.sendEvent(name: Event.onLocationChange.rawValue, params: params as NSDictionary)
+    }
+    
+    func onPermissionChange(status: CLAuthorizationStatus) {
+        guard let delegate = delegate else {
+            return
+        }
+        if (!delegate.isJsListening) {
+            return
+        }
+        print(Event.didAuthorizedChange.rawValue)
+        let params = Dictionary(dictionaryLiteral: ("status", status))
+        delegate.sendEvent(name: Event.didAuthorizedChange.rawValue, params: params as NSDictionary)
     }
 }
 
