@@ -9,7 +9,6 @@ import CoreLocation
 
 class TurboLocationProvider: NSObject {
     private let locationManager: CLLocationManager
-    private var locationOptions: TurboLocationOptions? = nil
     weak var delegate: TurboLocationProviderDelegate?
     
     override init() {
@@ -21,10 +20,7 @@ class TurboLocationProvider: NSObject {
     deinit {
         removeLocationUpdates()
         locationManager.delegate = nil;
-        locationOptions=nil
     }
-    
-    
     
     func requestPermission(_ level: String) -> Void {
         print("TurboProvider requestPermission",level)
@@ -36,20 +32,18 @@ class TurboLocationProvider: NSObject {
         }
     }
     
-    func getCurrentLocation(option: TurboLocationOptions){
-        print("TurboProvider call getCurrentLocation")
-        locationManager.desiredAccuracy = CLLocationAccuracy(option.accuracy)
+    func getCurrentLocation( _ options: TurboLocationOptions){
+        locationManager.desiredAccuracy = CLLocationAccuracy(options.accuracy)
         locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.requestLocation()
     }
     
-    func requestLocationUpdates(option: TurboLocationOptions) -> Void {
-        locationOptions = option
-        locationManager.desiredAccuracy = CLLocationAccuracy(locationOptions!.accuracy)
-        locationManager.distanceFilter = locationOptions!.distanceFilter
-        locationManager.activityType = .automotiveNavigation
+    func requestLocationUpdates( _ options: TurboLocationOptions) -> Void {
+        locationManager.desiredAccuracy = CLLocationAccuracy(options.accuracy)
+        locationManager.distanceFilter = options.distanceFilter
+        locationManager.activityType = .otherNavigation
         locationManager.allowsBackgroundLocationUpdates = false
-        locationManager.pausesLocationUpdatesAutomatically = locationOptions!.pauseUpdatesAutomatically
+        locationManager.pausesLocationUpdatesAutomatically = options.pauseUpdatesAutomatically
         
         if #available(iOS 11.0, *) {
             locationManager.showsBackgroundLocationIndicator = false
@@ -62,6 +56,9 @@ class TurboLocationProvider: NSObject {
         locationManager.stopUpdatingLocation()
     }
     
+    
+    
+    
     @objc private func timerFired(timer: Timer) -> Void {
 #if DEBUG
         NSLog("RNLocation: request timed out")
@@ -69,6 +66,20 @@ class TurboLocationProvider: NSObject {
         
         //    delegate?.onLocationError(self, err: LocationError.TIMEOUT, message: nil)
         locationManager.stopUpdatingLocation()
+    }
+    
+    private func isPermissionGranted() -> Bool{
+        if CLLocationManager.locationServicesEnabled() {
+            switch locationManager.authorizationStatus {
+            case .notDetermined, .restricted, .denied:
+                return false
+            case .authorizedAlways, .authorizedWhenInUse:
+                return true
+            @unknown default:
+                return false
+            }
+        }
+        return false
     }
 }
 

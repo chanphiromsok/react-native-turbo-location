@@ -14,5 +14,6 @@ NS_ASSUME_NONNULL_END
 #import <React/RCTBridgeModule.h>
 @interface TurboLocation : RCTEventEmitter <RCTBridgeModule>
 #endif
+// MUST define this otherwise EventEmiter not work
 @property (nonatomic, assign) BOOL isJsListening;
 @end

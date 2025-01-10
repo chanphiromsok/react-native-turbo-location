@@ -5,7 +5,6 @@
 //  Created by rom on 09/01/2025.
 //
 
-import Foundation
 import CoreLocation
 
 @objc
@@ -33,6 +32,7 @@ public class TurboLocationEventManager:NSObject {
         let params = Dictionary(dictionaryLiteral: ("status", status))
         delegate.sendEvent(name: Event.didAuthorizedChange.rawValue, params: params as NSDictionary)
     }
+    
     private func locationToDict(_ location: CLLocation) -> [String: Any] {
         return [
             "coords": [

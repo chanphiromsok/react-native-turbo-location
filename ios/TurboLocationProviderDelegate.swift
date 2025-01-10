@@ -5,7 +5,6 @@
 //  Created by rom on 09/01/2025.
 //
 
-import Foundation
 import CoreLocation
 
 protocol TurboLocationProviderDelegate: AnyObject {

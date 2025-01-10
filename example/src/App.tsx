@@ -12,7 +12,6 @@ export default function App() {
       console.log('ModuleEventEmitter sqrt', value);
       Alert.alert(`${value.coords.latitude} ${value.coords.longitude}`);
     });
-    getCurrentLocation();
     requestPermission();
   }, []);
   return (
@@ -21,7 +20,9 @@ export default function App() {
       <TouchableOpacity>
         <Text
           onPress={() => {
-            getCurrentLocation();
+            getCurrentLocation((location) => {
+              console.log(location);
+            });
           }}
         >
           Get Location

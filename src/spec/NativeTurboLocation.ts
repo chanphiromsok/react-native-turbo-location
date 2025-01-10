@@ -2,17 +2,33 @@ import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
 type Location = {
-  latitude: number;
-  longitude: number;
-  heading: number;
-  accuracy: number;
+  coords: {
+    altitudeAccuracy: number;
+    latitude: number;
+    heading: number;
+    altitude: number;
+    mocked: boolean;
+    longitude: number;
+    speed: number;
+    accuracy: number;
+  };
   timestamp: number;
-  altitude: number;
-  speed: number;
 };
+
+type SuccessParams = Location;
+type ErrorParams = {
+  error: string;
+  code: string;
+};
+export type SuccessCallBack = (params: SuccessParams) => void;
+export type ErrorCallback = (params: ErrorParams) => void;
+
 export interface Spec extends TurboModule {
   requestPermission(): Promise<void>;
-  getCurrentLocation(): Promise<Location>;
+  getCurrentLocation(
+    successCallback: SuccessCallBack,
+    errorCallback: ErrorCallback
+  ): void;
   startWatching(): Promise<void>;
   addListener: (eventType: string) => void;
   removeListeners: (count: number) => void;

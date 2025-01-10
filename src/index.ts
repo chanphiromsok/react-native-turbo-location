@@ -1,4 +1,8 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import type {
+  ErrorCallback,
+  SuccessCallBack,
+} from './spec/NativeTurboLocation';
 
 const LINKING_ERROR =
   "The package 'react-native-mock-location-detector' doesn't seem to be linked. Make sure: \n\n" +
@@ -27,8 +31,12 @@ export const ModuleEventEmitter = new NativeEventEmitter(TurboLocation);
 export async function requestPermission() {
   return TurboLocationModule.requestPermission();
 }
-export async function getCurrentLocation() {
-  return TurboLocationModule.getCurrentLocation();
+
+export async function getCurrentLocation(
+  success: SuccessCallBack,
+  error?: ErrorCallback
+) {
+  return TurboLocationModule.getCurrentLocation(success, error);
 }
 
 // type OnLocationChange = (location: any) => void;
@@ -41,5 +49,3 @@ export async function startWatching() {
 
   // return listener;
 }
-
-console.log(TurboLocationModule);

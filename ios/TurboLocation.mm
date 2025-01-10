@@ -8,9 +8,12 @@
 
 //static TurboLocationImpl *_director = [TurboLocationImpl new];
 @interface TurboLocation () <TurboLocationEventEmitterDelegate>
+
 @end
+
 @implementation TurboLocation {
     TurboLocationImpl *turboLocation;
+    TurboLocationOptions *options;
 }
 RCT_EXPORT_MODULE()
 
@@ -23,10 +26,17 @@ RCT_EXPORT_MODULE()
     self = [super init];
     if(self) {
         // Option 2.B - Instantiate the Calculator and set the delegate
-        turboLocation = [TurboLocationImpl new];
+        turboLocation = [[TurboLocationImpl alloc] init];
+        options = [[TurboLocationOptions alloc] init];
         [turboLocation setEventManagerWithDelegate:self];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    self->turboLocation = nil;
+    self->options = nil;
 }
 
 #pragma mark - Monitoring
@@ -41,16 +51,30 @@ RCT_EXPORT_MODULE()
 - (NSArray<NSString *> *)supportedEvents {
     return [TurboLocationEventManager supportedEvents];
 }
+// https://github.com/reactwg/react-native-new-architecture/blob/main/docs/enable-libraries-ios.md callback:(RCTResponseSenderBlock)callback
 // Options 2.D - Implement the Specs
-RCT_EXPORT_METHOD(getCurrentLocation:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    TurboLocationOptions *options = [[TurboLocationOptions alloc] init];
-    options.distanceFilter = 10.0;
-    options.pauseUpdatesAutomatically = YES;
-    options.accuracy = LocationAccuracyMedium;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self->turboLocation getCurrentLocationWithOption:options];
-    });
-    resolve(@"OK");
+//RCT_EXPORT_METHOD(getCurrentLocation:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+//    
+//    options.distanceFilter = 10.0;
+//    options.pauseUpdatesAutomatically = YES;
+//    options.accuracy = LocationAccuracyMedium;
+////    NSLog(@"New arch enabeld %d", RCT_NEW_ARCH_ENABLED);
+//    
+////    dispatch_async(dispatch_get_main_queue(), ^{
+////        [self->turboLocation getCurrentLocationWithOptions:self->options];
+////    });
+//}
+
+RCT_EXPORT_METHOD(getCurrentLocation:(RCTResponseSenderBlock)successCallback
+                         errorCallback:(RCTResponseSenderBlock)errorCallback) {
+    [self->turboLocation getCurrentLocation:^(NSDictionary *location) {
+        successCallback(@[location]);
+    } failure:^(NSError *error) {
+        errorCallback(@[@{
+            @"code": @(error.code),
+            @"message": error.localizedDescription
+        }]);
+    }];
 }
 
 RCT_EXPORT_METHOD(startWatching:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
@@ -58,7 +82,7 @@ RCT_EXPORT_METHOD(startWatching:(RCTPromiseResolveBlock)resolve reject:(RCTPromi
     options.distanceFilter = 10.0;
     options.pauseUpdatesAutomatically = YES;
     options.accuracy = LocationAccuracyMedium;
-    [turboLocation startWatchingWithOption:options];
+    [turboLocation startWatchingWithOptions:options];
 }
 
 RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
