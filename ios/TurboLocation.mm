@@ -6,20 +6,27 @@
 #import "react_native_turbo_location/react_native_turbo_location-Swift.h"
 #endif
 
-//static TurboLocationImpl *_director = [TurboLocationImpl new];
-@interface TurboLocation () <TurboLocationEventEmitterDelegate>
 
+@interface TurboLocation () <TurboLocationEventEmitterDelegate>
 @end
 
 @implementation TurboLocation {
     TurboLocationImpl *turboLocation;
-    TurboLocationOptions *options;
 }
+// Don't compile this code when we build for the old architecture.
+#ifdef RCT_NEW_ARCH_ENABLED
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+(const facebook::react::ObjCTurboModule::InitParams &)params
+{
+    return std::make_shared<facebook::react::NativeTurboLocationSpecJSI>(params);
+}
+#endif
+
 RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
-    return YES;
+    return NO;
 }
 
 - (instancetype)init {
@@ -27,7 +34,6 @@ RCT_EXPORT_MODULE()
     if(self) {
         // Option 2.B - Instantiate the Calculator and set the delegate
         turboLocation = [[TurboLocationImpl alloc] init];
-        options = [[TurboLocationOptions alloc] init];
         [turboLocation setEventManagerWithDelegate:self];
     }
     return self;
@@ -37,7 +43,6 @@ RCT_EXPORT_MODULE()
 {
     [self->turboLocation stopUpdatingLocation];
     self->turboLocation = nil;
-    self->options = nil;
 }
 
 #pragma mark - Monitoring
@@ -53,11 +58,10 @@ RCT_EXPORT_MODULE()
     return [TurboLocationEventManager supportedEvents];
 }
 // https://github.com/reactwg/react-native-new-architecture/blob/main/docs/enable-libraries-ios.md callback:(RCTResponseSenderBlock)callback
-// Options 2.D - Implement the Specs
 typedef void(^TurboCallback)(NSDictionary *location);
-
-RCT_EXPORT_METHOD(getCurrentLocation:(RCTResponseSenderBlock)successCallback
-                         errorCallback:(RCTResponseSenderBlock)errorCallback) {
+RCT_EXPORT_METHOD(getCurrentLocation:(NSDictionary *)options
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  errorCallback:(RCTResponseSenderBlock)errorCallback) {
     
     TurboCallback success = ^(NSDictionary *location) {
         successCallback(@[location]);
@@ -66,41 +70,33 @@ RCT_EXPORT_METHOD(getCurrentLocation:(RCTResponseSenderBlock)successCallback
     TurboCallback failure= ^(NSDictionary *error) {
         errorCallback(@[error]);
     };
+#ifdef DEBUG
+    NSLog(@"getCurrentLocation SHOW_ONLY_DEBUG %@",options);
+#endif
     
-    [self->turboLocation getCurrentLocation:success failure:failure];
+    [self->turboLocation getCurrentLocation:options success: success failure:failure];
 }
-RCT_EXPORT_METHOD(startWatching:(RCTResponseSenderBlock)successCallback) {
-    TurboCallback callback = ^(NSDictionary *location) {
-            successCallback(@[location]);
-    };
-    [turboLocation startWatching:callback];
+RCT_EXPORT_METHOD(startWatching:(NSDictionary *) options) {
+#ifdef DEBUG
+    NSLog(@"startWatching SHOW_ONLY_DEBUG %@",options);
+#endif
+    [self->turboLocation startWatching: options];
 }
 
-RCT_EXPORT_METHOD(stopUpdatingLocation) {
-    [turboLocation stopUpdatingLocation];
+RCT_EXPORT_METHOD(stopWatching) {
+    [self->turboLocation stopUpdatingLocation];
 };
-
 
 RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->turboLocation requestPermission];
     });
-    resolve(@"Ok");
+    
 }
-
 
 
 - (void)sendEventWithName:(NSString * _Nonnull)name params:(NSDictionary *)params {
     [self sendEventWithName:name body:params];
 }
-
-// Don't compile this code when we build for the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
-(const facebook::react::ObjCTurboModule::InitParams &)params
-{
-    return std::make_shared<facebook::react::NativeTurboLocationSpecJSI>(params);
-}
-#endif
 
 @end

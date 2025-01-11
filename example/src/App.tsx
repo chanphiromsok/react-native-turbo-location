@@ -3,11 +3,25 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   getCurrentLocation,
   requestPermission,
+  startWatching,
 } from 'react-native-turbo-location';
 
 export default function App() {
   useEffect(() => {
     requestPermission();
+    if (true) {
+      startWatching(
+        (location) => {
+          console.log('watching location', location);
+        },
+        {
+          activityType: 'other',
+          desiredAccuracy: 'best',
+          pausesLocationUpdatesAutomatically: true,
+          waitForAccuracy: false,
+        }
+      );
+    }
   }, []);
   return (
     <View style={styles.container}>
@@ -16,6 +30,12 @@ export default function App() {
         <Text
           onPress={() => {
             getCurrentLocation(
+              {
+                activityType: 'other',
+                desiredAccuracy: 'hight',
+                pausesLocationUpdatesAutomatically: true,
+                waitForAccuracy: false,
+              },
               (location) => {
                 console.log(location);
               },

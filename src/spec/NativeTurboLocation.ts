@@ -21,15 +21,15 @@ type ErrorParams = {
 };
 export type SuccessCallBack = (params: SuccessParams) => void;
 export type ErrorCallback = (params: ErrorParams) => void;
-
 export interface Spec extends TurboModule {
   requestPermission(): Promise<void>;
   getCurrentLocation(
+    options: Object,
     successCallback: SuccessCallBack,
     errorCallback: ErrorCallback
   ): void;
-  startWatching(successCallback: SuccessCallBack): void;
-  stopUpdatingLocation(): void;
+  startWatching(options: Object): void;
+  stopWatching(): void;
   addListener: (eventType: string) => void;
   removeListeners: (count: number) => void;
 }

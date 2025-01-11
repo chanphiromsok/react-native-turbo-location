@@ -3,6 +3,8 @@ import type {
   ErrorCallback,
   SuccessCallBack,
 } from './spec/NativeTurboLocation';
+import type { LocationOptions } from './type';
+import { getOptions } from './utils';
 
 const LINKING_ERROR =
   "The package 'react-native-mock-location-detector' doesn't seem to be linked. Make sure: \n\n" +
@@ -33,21 +35,34 @@ export async function requestPermission() {
 }
 
 export async function getCurrentLocation(
+  options: LocationOptions,
   success: SuccessCallBack,
   error?: ErrorCallback
 ) {
-  return TurboLocationModule.getCurrentLocation(success, error);
+  const locationOptions = getOptions(options);
+  return TurboLocationModule.getCurrentLocation(
+    locationOptions,
+    success,
+    error
+  );
 }
 
-// type OnLocationChange = (location: any) => void;
-export async function startWatching(success: SuccessCallBack) {
-  // const listener = ModuleEventEmitter.addListener(
-  //   'onLocationChange',
-  //   onLocationChange
-  // );
-  await TurboLocationModule.startWatching(success);
-
-  // return listener;
+export async function startWatching(
+  onLocation: SuccessCallBack,
+  options?: LocationOptions
+) {
+  const locationOptions = getOptions(options);
+  await TurboLocationModule.startWatching(locationOptions);
+  const subscription = ModuleEventEmitter.addListener(
+    'onLocationChange',
+    onLocation
+  );
+  return {
+    remove: () => {
+      TurboLocationModule.stopUpdatingLocation();
+      subscription.remove();
+    },
+  };
 }
 
 export async function stopUpdating() {

@@ -185,7 +185,7 @@
   "codegenConfig": {
     "name": "RNTurboLocationSpec",
     "type": "all",
-    "jsSrcsDir": "src",
+    "jsSrcsDir": "src/spec",
     "outputDir": {
       "ios": "ios/generated",
       "android": "android/generated"
