@@ -65,6 +65,11 @@ export async function startWatching(
   };
 }
 
+export const onAuthorizeChange = (
+  listener: (params: { status: string }) => void
+) => {
+  return ModuleEventEmitter.addListener('didAuthorizedChange', listener);
+};
 export async function stopUpdating() {
   TurboLocationModule.stopUpdatingLocation();
 }
