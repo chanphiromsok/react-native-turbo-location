@@ -62,18 +62,18 @@ typedef void(^TurboCallback)(NSDictionary *location);
 RCT_EXPORT_METHOD(getCurrentLocation:(NSDictionary *)options
                   successCallback:(RCTResponseSenderBlock)successCallback
                   errorCallback:(RCTResponseSenderBlock)errorCallback) {
-    
+
     TurboCallback success = ^(NSDictionary *location) {
         successCallback(@[location]);
     };
-    
+
     TurboCallback failure= ^(NSDictionary *error) {
         errorCallback(@[error]);
     };
 #ifdef DEBUG
     NSLog(@"getCurrentLocation SHOW_ONLY_DEBUG %@",options);
 #endif
-    
+
     [self->turboLocation getCurrentLocation:options success: success failure:failure];
 }
 RCT_EXPORT_METHOD(startWatching:(NSDictionary *) options) {
@@ -88,10 +88,10 @@ RCT_EXPORT_METHOD(stopWatching) {
 };
 
 RCT_EXPORT_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // dispatch_async(dispatch_get_main_queue(), ^{
         [self->turboLocation requestPermission];
-    });
-    
+    // });
+
 }
 
 
